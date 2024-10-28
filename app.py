@@ -1,5 +1,6 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request ,Response
 import sqlite3
+import json
 
 app = Flask(__name__)
 
@@ -11,7 +12,6 @@ def get_annual_data(api_well_number):
 
     cursor.execute("SELECT OIL, GAS, BRINE FROM annual_production WHERE API_WELL_NUMBER = ?", (api_well_number,))
     row = cursor.fetchone()
-
     conn.close()
 
     if row:
@@ -31,7 +31,8 @@ def api_get_annual_data():
     try:
         data = get_annual_data(well_number)
         if data:
-            return jsonify(data), 200
+            return Response(response=json.dumps(data, sort_keys=False),mimetype='application/json'
+    )
         else:
             return jsonify({"error": "Data not found for the specified well."}), 404
     except Exception as e:
